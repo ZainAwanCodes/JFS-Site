@@ -1,27 +1,35 @@
 "use client";
 
 import { useState } from "react";
-import { useAdmin, Shipment } from "@/context/AdminContext";
-import { Search, MapPin, Truck, CheckCircle, Package, AlertCircle } from "lucide-react";
+import { Search, Truck, CheckCircle, Package, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function TrackingPage() {
-    const { shipments } = useAdmin();
     const [trackingInput, setTrackingInput] = useState("");
-    const [shipment, setShipment] = useState<Shipment | null>(null);
+    const [shipment, setShipment] = useState<any>(null);
     const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    const handleTrack = (e: React.FormEvent) => {
+    const handleTrack = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!trackingInput.trim()) return;
+
         setError("");
+        setLoading(true);
 
-        const found = shipments.find(s => s.trackingNumber.trim().toUpperCase() === trackingInput.trim().toUpperCase());
-
-        if (found) {
-            setShipment(found);
-        } else {
-            setShipment(null);
-            setError("Tracking number not found. Please check and try again.");
+        try {
+            const res = await fetch(`/api/shipments?id=${trackingInput.trim().toUpperCase()}`);
+            if (res.ok) {
+                const data = await res.json();
+                setShipment(data);
+            } else {
+                setShipment(null);
+                setError("Tracking number not found. Please check and try again.");
+            }
+        } catch (err) {
+            setError("Failed to fetch tracking information. Please try again later.");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -49,16 +57,17 @@ export default function TrackingPage() {
                     <form onSubmit={handleTrack} className="max-w-xl mx-auto relative">
                         <input
                             type="text"
-                            placeholder="Enter Tracking ID (e.g. BOL-1234)"
+                            placeholder="Enter Tracking ID (e.g. SHP-1001)"
                             value={trackingInput}
                             onChange={(e) => setTrackingInput(e.target.value)}
                             className="w-full bg-dark-800 border-2 border-gray-700 rounded-full py-4 pl-6 pr-14 text-white text-lg focus:border-primary-500 outline-none shadow-lg"
                         />
                         <button
                             type="submit"
-                            className="absolute right-2 top-2 bottom-2 bg-primary-600 hover:bg-primary-500 text-white p-3 rounded-full transition-colors"
+                            disabled={loading}
+                            className="absolute right-2 top-2 bottom-2 bg-primary-600 hover:bg-primary-500 text-white p-3 rounded-full transition-colors disabled:opacity-50"
                         >
-                            <Search size={24} />
+                            {loading ? <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div> : <Search size={24} />}
                         </button>
                     </form>
 
@@ -86,12 +95,12 @@ export default function TrackingPage() {
                             {/* Header */}
                             <div className="bg-dark-700 p-6 flex justify-between items-center border-b border-gray-600">
                                 <div>
-                                    <h2 className="text-2xl font-bold text-white mb-1">Tracking #{shipment.trackingNumber}</h2>
-                                    <p className="text-gray-400 text-sm">Created on {shipment.date}</p>
+                                    <h2 className="text-2xl font-bold text-white mb-1">Tracking #{shipment.id}</h2>
+                                    <p className="text-gray-400 text-sm">Last updated: {new Date(shipment.updatedAt).toLocaleDateString()}</p>
                                 </div>
                                 <div className={`px-4 py-2 rounded-full font-bold ${shipment.status === 'Delivered' ? 'bg-green-500/20 text-green-400' :
-                                        shipment.status === 'In Transit' ? 'bg-blue-500/20 text-blue-400' :
-                                            'bg-yellow-500/20 text-yellow-500'
+                                    shipment.status === 'In Transit' ? 'bg-blue-500/20 text-blue-400' :
+                                        'bg-yellow-500/20 text-yellow-500'
                                     }`}>
                                     {shipment.status}
                                 </div>
@@ -100,14 +109,12 @@ export default function TrackingPage() {
                             {/* Progress Bar */}
                             <div className="p-8">
                                 <div className="relative">
-                                    {/* Line */}
                                     <div className="absolute top-1/2 left-0 w-full h-1 bg-gray-700 -translate-y-1/2 rounded"></div>
                                     <div
                                         className="absolute top-1/2 left-0 h-1 bg-primary-500 -translate-y-1/2 rounded transition-all duration-1000"
                                         style={{ width: `${((currentStep - 1) / 3) * 100}%` }}
                                     ></div>
 
-                                    {/* Step Dots */}
                                     <div className="relative flex justify-between">
                                         {['Pending', 'Picked Up', 'In Transit', 'Delivered'].map((step, index) => {
                                             const stepNum = index + 1;
@@ -158,21 +165,38 @@ export default function TrackingPage() {
                                     <div className="bg-dark-900 rounded-lg p-4 space-y-3">
                                         <div className="flex justify-between">
                                             <span className="text-gray-500">Receiver:</span>
-                                            <span className="text-white font-medium">{shipment.consigneeName}</span>
+                                            <span className="text-white font-medium">{shipment.consigneeName || "N/A"}</span>
                                         </div>
                                         <div className="flex justify-between">
                                             <span className="text-gray-500">Content:</span>
-                                            <span className="text-white font-medium">{shipment.goodsDescription}</span>
+                                            <span className="text-white font-medium">{shipment.goodsDescription || "N/A"}</span>
                                         </div>
-                                        {shipment.driverId && (
-                                            <div className="flex justify-between items-center text-blue-400 text-sm mt-2 pt-2 border-t border-gray-800">
-                                                <span>Driver Assigned</span>
-                                                <CheckCircle size={14} />
-                                            </div>
-                                        )}
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-500">Estimated Delivery:</span>
+                                            <span className="text-white font-medium">{shipment.estimatedDelivery}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+
+                            {/* History */}
+                            {shipment.history && shipment.history.length > 0 && (
+                                <div className="p-8 border-t border-gray-700">
+                                    <h3 className="text-gray-400 text-sm uppercase tracking-wider mb-4">Status Updates</h3>
+                                    <div className="space-y-4">
+                                        {shipment.history.map((h: any, i: number) => (
+                                            <div key={i} className="flex justify-between items-center text-sm">
+                                                <div className="flex items-center">
+                                                    <div className="w-2 h-2 rounded-full bg-primary-500 mr-3"></div>
+                                                    <span className="text-white font-medium">{h.status}</span>
+                                                    <span className="text-gray-500 ml-2">- {h.location}</span>
+                                                </div>
+                                                <span className="text-gray-500">{h.date}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
 
                         </motion.div>
                     )}

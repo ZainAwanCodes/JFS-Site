@@ -4,15 +4,18 @@ import { motion } from "framer-motion";
 import { Star, Quote, User } from "lucide-react";
 
 interface Review {
-    id: number;
+    id: string | number;
     name: string;
     rating: number;
     comment: string;
-    date: string;
-    location: string;
+    date?: string;
+    createdAt?: string;
+    location?: string;
 }
 
 export default function ReviewCard({ review, index }: { review: Review; index: number }) {
+    const displayDate = review.date || (review.createdAt ? new Date(review.createdAt).toLocaleDateString() : 'Recent');
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -28,7 +31,7 @@ export default function ReviewCard({ review, index }: { review: Review; index: n
                 </div>
                 <div>
                     <h4 className="font-bold text-white text-lg leading-tight">{review.name}</h4>
-                    <p className="text-sm text-gray-500">{review.location} • {review.date}</p>
+                    <p className="text-sm text-gray-500">{review.location || 'Verified Client'} • {displayDate}</p>
                 </div>
             </div>
 

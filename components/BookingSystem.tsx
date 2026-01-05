@@ -61,11 +61,23 @@ export default function BookingSystem() {
     setSubmitStatus('idle');
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const response = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
 
-      // Redirect to checkout instead of just showing success
-      router.push('/checkout');
+      if (!response.ok) throw new Error('Failed to submit booking');
+
+      setSubmitStatus('success');
+      reset();
+
+      // Optional: Redirect to checkout or show success for a bit
+      setTimeout(() => {
+        router.push('/checkout');
+      }, 2000);
 
     } catch (error) {
       console.error('Error submitting booking:', error);

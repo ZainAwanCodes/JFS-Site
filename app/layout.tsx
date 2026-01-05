@@ -9,9 +9,7 @@ export const metadata: Metadata = {
 };
 
 import { AdminProvider } from "@/context/AdminContext";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import WhatsAppButton from "@/components/WhatsAppButton";
+import ConditionalShell from "@/components/ConditionalShell";
 
 export default function RootLayout({
   children,
@@ -22,10 +20,9 @@ export default function RootLayout({
     <html lang="en">
       <body className="antialiased">
         <AdminProvider>
-          <Navbar />
-          {children}
-          <Footer />
-          <WhatsAppButton />
+          <ConditionalShell>
+            {children}
+          </ConditionalShell>
         </AdminProvider>
       </body>
     </html>

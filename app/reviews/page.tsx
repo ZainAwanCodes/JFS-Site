@@ -2,55 +2,32 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Plus } from "lucide-react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import { useEffect, useState } from "react";
 import ReviewCard from "@/components/ReviewCard";
-
-const reviews = [
-    {
-        id: 1,
-        name: "Ahmed Khan",
-        rating: 5,
-        comment: "Outstanding service! Our goods arrived on time and in perfect condition. Highly recommend JFS Transport.",
-        date: "2 Days ago",
-        location: "Lahore"
-    },
-    {
-        id: 2,
-        name: "Fatima Ali",
-        rating: 5,
-        comment: "Professional team, affordable rates, and excellent customer support. They made our logistics so much easier.",
-        date: "1 Week ago",
-        location: "Karachi"
-    },
-    {
-        id: 3,
-        name: "Hassan Malik",
-        rating: 4,
-        comment: "Reliable service. The driver was very cooperative. Will definitely use again for my business shipments.",
-        date: "2 Weeks ago",
-        location: "Islamabad"
-    },
-    {
-        id: 4,
-        name: "Zainab Bibi",
-        rating: 5,
-        comment: "The best transport company in Faisalabad. Very transparent pricing and real-time updates.",
-        date: "3 Weeks ago",
-        location: "Faisalabad"
-    },
-    {
-        id: 5,
-        name: "Bilal Sheikh",
-        rating: 5,
-        comment: "Moved my entire office furniture without a scratch. Kudos to the team!",
-        date: "1 Month ago",
-        location: "Multan"
-    }
-];
+import { Loader2, Plus } from "lucide-react";
 
 export default function ReviewsPage() {
+    const [reviews, setReviews] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchReviews = async () => {
+            try {
+                // Fetch approved reviews
+                const res = await fetch("/api/reviews?status=approved");
+                if (res.ok) {
+                    const data = await res.json();
+                    setReviews(data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch reviews:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchReviews();
+    }, []);
+
     return (
         <div className="min-h-screen bg-transparent text-white">
             <div className="pt-32 pb-20 px-4 md:px-8 max-w-7xl mx-auto">
@@ -73,11 +50,25 @@ export default function ReviewsPage() {
                     </Link>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {reviews.map((review, index) => (
-                        <ReviewCard key={review.id} review={review} index={index} />
-                    ))}
-                </div>
+                {loading ? (
+                    <div className="flex justify-center py-20">
+                        <Loader2 className="w-12 h-12 text-primary-500 animate-spin" />
+                    </div>
+                ) : (
+                    <>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {reviews.map((review: any, index: number) => (
+                                <ReviewCard key={review.id} review={review} index={index} />
+                            ))}
+                        </div>
+
+                        {reviews.length === 0 && (
+                            <div className="text-center py-20 bg-dark-800/50 rounded-2xl border border-gray-700">
+                                <p className="text-gray-400 text-lg">No reviews found yet. Be the first to write one!</p>
+                            </div>
+                        )}
+                    </>
+                )}
             </div>
         </div>
     );

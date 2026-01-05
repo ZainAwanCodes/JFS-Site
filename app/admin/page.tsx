@@ -1,48 +1,57 @@
 "use client";
 
-import { mockAdminStats } from "@/lib/mockData";
+import { useEffect, useState } from "react";
 import { DollarSign, Archive, TrendingUp, Users } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function AdminDashboard() {
-    const stats = [
-        {
-            label: "Total Bookings",
-            value: mockAdminStats.totalBookings,
-            icon: Archive,
-            color: "text-blue-400",
-            bg: "bg-blue-500/10",
-            border: "border-blue-500/20",
-            change: "+12.5%",
-        },
-        {
-            label: "Active Shipments",
-            value: mockAdminStats.activeShipments,
-            icon: TrendingUp,
-            color: "text-green-400",
-            bg: "bg-green-500/10",
-            border: "border-green-500/20",
-            change: "+4.3%",
-        },
-        {
-            label: "Total Revenue",
-            value: `Rs. ${mockAdminStats.revenue.toLocaleString()}`,
-            icon: DollarSign,
-            color: "text-primary-400",
-            bg: "bg-primary-500/10",
-            border: "border-primary-500/20",
-            change: "+8.1%",
-        },
-        {
-            label: "New Customers",
-            value: "2",
-            icon: Users,
-            color: "text-purple-400",
-            bg: "bg-purple-500/10",
-            border: "border-purple-500/20",
-            change: "+2.4%",
-        },
-    ];
+    const [stats, setStats] = useState([
+        { label: "Total Bookings", value: "0", icon: Archive, color: "text-blue-400", bg: "bg-blue-500/10", border: "border-blue-500/20", change: "+0%" },
+        { label: "Active Shipments", value: "0", icon: TrendingUp, color: "text-green-400", bg: "bg-green-500/10", border: "border-green-500/20", change: "+0%" },
+        { label: "Total Revenue", value: "Rs. 0", icon: DollarSign, color: "text-primary-400", bg: "bg-primary-500/10", border: "border-primary-500/20", change: "+0%" },
+        { label: "Total Drivers", value: "0", icon: Users, color: "text-purple-400", bg: "bg-purple-500/10", border: "border-purple-500/20", change: "+0%" },
+    ]);
+    const [recentBookings, setRecentBookings] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchDashboardData = async () => {
+            try {
+                const [bookingsRes, shipmentsRes, driversRes] = await Promise.all([
+                    fetch("/api/bookings"),
+                    fetch("/api/shipments"),
+                    fetch("/api/drivers")
+                ]);
+
+                const totalBookings = await bookingsRes.json();
+                const shipments = await shipmentsRes.json();
+                const drivers = await driversRes.json();
+
+                // Group bookings
+                const acceptedBookings = totalBookings.filter((b: any) => b.status === "Confirmed" || b.status === "Processed");
+                const pendingRequests = totalBookings.filter((b: any) => b.status === "Pending");
+
+                // Calculate simple stats
+                const totalRevenue = acceptedBookings.reduce((sum: number, b: any) => sum + (b.amount || 45000), 0); // Default estimate if no amount
+                const activeShipmentsCount = shipments.filter((s: any) => s.status !== "Delivered").length;
+
+                setStats([
+                    { label: "Approved Bookings", value: acceptedBookings.length.toString(), icon: Archive, color: "text-blue-400", bg: "bg-blue-500/10", border: "border-blue-500/20", change: `+${pendingRequests.length} Pending` },
+                    { label: "Active Shipments", value: activeShipmentsCount.toString(), icon: TrendingUp, color: "text-green-400", bg: "bg-green-500/10", border: "border-green-500/20", change: "In Transit" },
+                    { label: "Total Revenue", value: `Rs. ${totalRevenue.toLocaleString()}`, icon: DollarSign, color: "text-primary-400", bg: "bg-primary-500/10", border: "border-primary-500/20", change: "Estimated" },
+                    { label: "Total Drivers", value: drivers.length.toString(), icon: Users, color: "text-purple-400", bg: "bg-purple-500/10", border: "border-purple-500/20", change: "Registered" },
+                ]);
+
+                setRecentBookings(acceptedBookings.slice(0, 5));
+            } catch (error) {
+                console.error("Failed to fetch dashboard data:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchDashboardData();
+    }, []);
 
     return (
         <div className="bg-dark-900 min-h-screen text-white p-8">
@@ -88,7 +97,7 @@ export default function AdminDashboard() {
                 className="bg-dark-800 rounded-xl shadow-lg border border-gray-700 overflow-hidden"
             >
                 <div className="p-6 border-b border-gray-700">
-                    <h2 className="text-lg font-bold text-white">Recent Bookings</h2>
+                    <h2 className="text-lg font-bold text-white">Recent Approved Bookings</h2>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm text-gray-400">
@@ -97,12 +106,11 @@ export default function AdminDashboard() {
                                 <th className="px-6 py-4">Booking ID</th>
                                 <th className="px-6 py-4">Customer</th>
                                 <th className="px-6 py-4">Route</th>
-                                <th className="px-6 py-4">Amount</th>
                                 <th className="px-6 py-4">Status</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-700">
-                            {mockAdminStats.recentBookings.map((booking, i) => (
+                            {recentBookings.map((booking: any, i) => (
                                 <motion.tr
                                     key={booking.id}
                                     initial={{ opacity: 0, x: -20 }}
@@ -111,16 +119,15 @@ export default function AdminDashboard() {
                                     className="hover:bg-dark-700/50 transition-colors"
                                 >
                                     <td className="px-6 py-4 font-medium text-white">{booking.id}</td>
-                                    <td className="px-6 py-4">{booking.customer}</td>
-                                    <td className="px-6 py-4">{booking.route}</td>
-                                    <td className="px-6 py-4">Rs. {booking.amount.toLocaleString()}</td>
+                                    <td className="px-6 py-4">{booking.name}</td>
+                                    <td className="px-6 py-4">{booking.pickupLocation.split(',')[0]} - {booking.deliveryLocation.split(',')[0]}</td>
                                     <td className="px-6 py-4">
                                         <span
-                                            className={`px-3 py-1 rounded-full text-xs font-semibold ${booking.status === "Completed"
-                                                    ? "bg-green-500/20 text-green-400 border border-green-500/30"
-                                                    : booking.status === "Pending"
-                                                        ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
-                                                        : "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+                                            className={`px-3 py-1 rounded-full text-xs font-semibold ${booking.status === "Confirmed"
+                                                ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                                                : booking.status === "Pending"
+                                                    ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
+                                                    : "bg-blue-500/20 text-blue-400 border border-blue-500/30"
                                                 }`}
                                         >
                                             {booking.status}
@@ -128,6 +135,11 @@ export default function AdminDashboard() {
                                     </td>
                                 </motion.tr>
                             ))}
+                            {recentBookings.length === 0 && !loading && (
+                                <tr>
+                                    <td colSpan={4} className="px-6 py-8 text-center text-gray-500">No bookings found</td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 </div>

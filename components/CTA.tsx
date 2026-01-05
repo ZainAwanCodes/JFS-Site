@@ -18,7 +18,7 @@ export default function CTA() {
             Ready to Ship Your Goods?
           </h2>
           <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            Get in touch with us today and experience the best transportation services in Pakistan. 
+            Get in touch with us today and experience the best transportation services in Pakistan.
             We&apos;re here to help you every step of the way.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -27,7 +27,7 @@ export default function CTA() {
               whileTap={{ scale: 0.95 }}
             >
               <Link
-                href="/contact"
+                href="/booking"
                 className="group px-8 py-4 bg-white text-accent-600 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-all shadow-lg flex items-center space-x-2"
               >
                 <span>Book Now</span>

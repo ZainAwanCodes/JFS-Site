@@ -37,8 +37,16 @@ export default function ContactForm() {
     setSubmitStatus('idle');
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      console.log('Form submitted:', data);
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) throw new Error('Failed to send message');
+
       setSubmitStatus('success');
       reset();
       setTimeout(() => setSubmitStatus('idle'), 5000);
@@ -53,7 +61,7 @@ export default function ContactForm() {
   return (
     <div className="bg-dark-800/50 backdrop-blur-sm p-8 rounded-xl border border-gray-800">
       <h2 className="text-2xl font-bold text-white mb-6">Send Us a Message</h2>
-      
+
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">

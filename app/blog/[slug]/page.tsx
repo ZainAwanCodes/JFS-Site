@@ -1,29 +1,50 @@
+"use client";
+
 import Link from "next/link";
 import NextImage from "next/image";
-import { notFound } from "next/navigation";
-import { ArrowLeft, Calendar, Users, Share2 } from "lucide-react";
-import { mockBlogPosts } from "@/lib/mockData";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-
-// This is required for static site generation with dynamic routes in Next.js
-export async function generateStaticParams() {
-    return mockBlogPosts.map((post) => ({
-        slug: post.slug,
-    }));
-}
+import { useEffect, useState } from "react";
+import { ArrowLeft, Calendar, Users, Share2, Loader2 } from "lucide-react";
 
 export default function BlogPostPage({ params }: { params: { slug: string } }) {
-    const post = mockBlogPosts.find((p) => p.slug === params.slug);
+    const [post, setPost] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchPost = async () => {
+            try {
+                const res = await fetch(`/api/blog?slug=${params.slug}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setPost(data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch post:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchPost();
+    }, [params.slug]);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-dark-900">
+                <Loader2 className="w-12 h-12 text-primary-500 animate-spin" />
+            </div>
+        );
+    }
 
     if (!post) {
-        notFound();
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center bg-dark-900 text-white">
+                <h1 className="text-4xl font-bold mb-4">Post Not Found</h1>
+                <Link href="/blog" className="text-primary-400 hover:underline">Return to Blog</Link>
+            </div>
+        );
     }
 
     return (
         <main className="min-h-screen bg-transparent text-gray-200">
-            <Navbar />
-
             <article className="pt-32 pb-20 relative">
                 {/* Post Header */}
                 <div className="max-w-4xl mx-auto px-4 md:px-8 mb-12 text-center relative z-10">
@@ -73,37 +94,16 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
                             {post.excerpt}
                         </p>
 
-                        <p className="mb-6 text-gray-300 leading-relaxed">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                        </p>
-                        <h2 className="text-3xl font-display font-bold text-white mt-12 mb-6">Understanding the basics</h2>
-                        <p className="mb-6 text-gray-300 leading-relaxed">
-                            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                        </p>
-                        <ul className="list-none space-y-4 mb-8 pl-4">
-                            {[
-                                "Efficient route planning strategies",
-                                "Proper packaging techniques for fragile items",
-                                "Real-time tracking benefits",
-                                "Understanding insurance coverage"
-                            ].map((item, i) => (
-                                <li key={i} className="flex items-center text-gray-300">
-                                    <span className="w-2 h-2 rounded-full bg-primary-500 mr-4"></span>
-                                    {item}
-                                </li>
-                            ))}
-                        </ul>
-                        <p className="mb-6 text-gray-300 leading-relaxed">
-                            Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.
-                        </p>
+                        <div className="mb-6 text-gray-300 leading-relaxed whitespace-pre-wrap">
+                            {post.content}
+                        </div>
                     </div>
 
                     {/* Share & Tags */}
                     <div className="mt-16 pt-8 border-t border-gray-800 flex flex-col sm:flex-row justify-between items-center gap-4">
                         <div className="flex items-center">
-                            <span className="text-sm font-bold text-gray-400 mr-4">Tags:</span>
-                            <span className="inline-block bg-dark-800 hover:bg-dark-700 transition-colors rounded-full px-4 py-1.5 text-sm text-primary-400 border border-gray-700 mr-2 cursor-pointer">Logistics</span>
-                            <span className="inline-block bg-dark-800 hover:bg-dark-700 transition-colors rounded-full px-4 py-1.5 text-sm text-primary-400 border border-gray-700 cursor-pointer">Transport</span>
+                            <span className="text-sm font-bold text-gray-400 mr-4">Category:</span>
+                            <span className="inline-block bg-dark-800 hover:bg-dark-700 transition-colors rounded-full px-4 py-1.5 text-sm text-primary-400 border border-gray-700 mr-2">{post.category}</span>
                         </div>
                         <button className="flex items-center text-gray-400 hover:text-white transition-colors bg-dark-800 hover:bg-primary-600 px-6 py-2 rounded-full border border-gray-700 hover:border-primary-500 group">
                             <Share2 className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
@@ -112,8 +112,6 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
                     </div>
                 </div>
             </article>
-
-            <Footer />
         </main>
     );
 }

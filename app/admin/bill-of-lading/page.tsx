@@ -35,18 +35,19 @@ export default function BillOfLadingPage() {
         doc.text("JEEWAY FATEH SONS", 14, 20);
         doc.setFontSize(12);
         doc.setTextColor(100);
-        doc.text("Goods Transport Company", 14, 26);
+        doc.text("Goods Transport Company Pakistan", 14, 26);
         doc.setFontSize(10);
-        doc.text("Head Office: Truck Stand, Bund Road, Lahore", 14, 32);
-        doc.text("Phone: +92 300 1234567 | Email: info@jfs.com", 14, 37);
+        doc.text("CEO: Malik Aslam Awan", 14, 32);
+        doc.text("Office: Rajbah Road Railway Mall Godam, Faisalabad", 14, 37);
+        doc.text("Phone: 03006614521 | 03336614521", 14, 42);
 
         // Title
         doc.setFillColor(6, 182, 212);
-        doc.rect(0, 45, 210, 10, 'F');
+        doc.rect(0, 50, 210, 10, 'F');
         doc.setTextColor(255);
         doc.setFontSize(14);
         doc.setFont("helvetica", 'bold');
-        doc.text("BILL OF LADING", 105, 51.5, { align: "center" } as any);
+        doc.text("BILL OF LADING", 105, 56.5, { align: "center" } as any);
 
         // Reset
         doc.setTextColor(0);
@@ -54,47 +55,47 @@ export default function BillOfLadingPage() {
         doc.setFontSize(10);
 
         // Tracking Info
-        doc.text(`Tracking #: ${formData.trackingNumber}`, 14, 65);
-        doc.text(`Date: ${formData.date}`, 150, 65);
+        doc.text(`Tracking #: ${formData.trackingNumber}`, 14, 70);
+        doc.text(`Date: ${formData.date}`, 150, 70);
 
         // Routes
-        doc.text(`From: ${formData.origin}`, 14, 72);
-        doc.text(`To: ${formData.destination}`, 150, 72);
+        doc.text(`From: ${formData.origin}`, 14, 78);
+        doc.text(`To: ${formData.destination}`, 150, 78);
 
         // Shipper & Consignee Boxes
         doc.setDrawColor(200);
 
         // Shipper
-        doc.rect(14, 80, 85, 35);
+        doc.rect(14, 90, 85, 35);
         doc.setFont("helvetica", 'bold');
-        doc.text("SHIPPER / SENDER:", 18, 86);
+        doc.text("SHIPPER / SENDER:", 18, 96);
         doc.setFont("helvetica", 'normal');
-        doc.text(formData.shipperName, 18, 93);
-        doc.text(formData.shipperAddress, 18, 98, { maxWidth: 75 });
-        doc.text(`Tel: ${formData.shipperPhone}`, 18, 110);
+        doc.text(formData.shipperName, 18, 103);
+        doc.text(formData.shipperAddress, 18, 108, { maxWidth: 75 });
+        doc.text(`Tel: ${formData.shipperPhone}`, 18, 120);
 
         // Consignee
-        doc.rect(110, 80, 85, 35);
+        doc.rect(110, 90, 85, 35);
         doc.setFont("helvetica", 'bold');
-        doc.text("CONSIGNEE / RECEIVER:", 114, 86);
+        doc.text("CONSIGNEE / RECEIVER:", 114, 96);
         doc.setFont("helvetica", 'normal');
-        doc.text(formData.consigneeName, 114, 93);
-        doc.text(formData.consigneeAddress, 114, 98, { maxWidth: 75 });
-        doc.text(`Tel: ${formData.consigneePhone}`, 114, 110);
+        doc.text(formData.consigneeName, 114, 103);
+        doc.text(formData.consigneeAddress, 114, 108, { maxWidth: 75 });
+        doc.text(`Tel: ${formData.consigneePhone}`, 114, 120);
 
         // Selected Driver
         const selectedDriver = drivers.find(d => d.id === formData.driverId);
         if (selectedDriver) {
             doc.setFont("helvetica", 'bold');
-            doc.text("CARRIER DETAILS:", 14, 125);
+            doc.text("CARRIER DETAILS:", 14, 135);
             doc.setFont("helvetica", 'normal');
-            doc.text(`Driver: ${selectedDriver.name} (${selectedDriver.phone})`, 14, 131);
-            doc.text(`Vehicle: ${selectedDriver.truckType} - ${selectedDriver.truckNumber}`, 14, 137);
+            doc.text(`Driver: ${selectedDriver.name} (${selectedDriver.phone})`, 14, 141);
+            doc.text(`Vehicle: ${selectedDriver.truckType} - ${selectedDriver.truckNumber}`, 14, 147);
         }
 
         // Goods Table
         autoTable(doc, {
-            startY: 145,
+            startY: 155,
             head: [['Qty', 'Description of Goods', 'Weight (kg)', 'Notes']],
             body: [
                 [formData.quantity, formData.goodsDescription, formData.weight, formData.notes],
@@ -122,11 +123,13 @@ export default function BillOfLadingPage() {
         // Save
         // Save to Database (Context)
         addShipment({
-            trackingNumber: formData.trackingNumber,
+            id: formData.trackingNumber,
             date: formData.date,
             origin: formData.origin,
             destination: formData.destination,
             status: "Pending",
+            currentLocation: "Origin Warehouse",
+            estimatedDelivery: "TBD",
             driverId: formData.driverId,
             consigneeName: formData.consigneeName,
             goodsDescription: formData.goodsDescription

@@ -1,8 +1,6 @@
 "use client";
 
 
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import PaymentForm from "@/components/PaymentForm";
 import { ShieldCheck, Truck } from "lucide-react";
 

@@ -1,0 +1,162 @@
+{
+  "bookings": [
+    {
+      "status": "Confirmed",
+      "pickupDate": "2026-01-06",
+      "pickupTime": "11:00 AM",
+      "pickupLocation": "Faisalabad",
+      "deliveryLocation": "Jaranwala",
+      "vehicleType": "shehzore",
+      "goodsDescription": "50 Carton ",
+      "name": "Muhammad Zain Awan",
+      "phone": "03216615621",
+      "email": "zain.202404864@gcuf.edu.pk",
+      "specialInstructions": "",
+      "id": "BK-1767605170547",
+      "createdAt": "2026-01-05T09:26:10.547Z"
+    }
+  ],
+  "shipments": [
+    {
+      "id": "SHP-1001",
+      "status": "In Transit",
+      "origin": "Lahore",
+      "destination": "Karachi",
+      "estimatedDelivery": "2023-10-25",
+      "currentLocation": "Sukkur Bypass",
+      "history": [
+        {
+          "status": "Picked Up",
+          "date": "2023-10-22 10:00 AM",
+          "location": "Lahore"
+        },
+        {
+          "status": "In Transit",
+          "date": "2023-10-23 02:00 PM",
+          "location": "Multan"
+        }
+      ]
+    },
+    {
+      "id": "SHP-1002",
+      "status": "Pending",
+      "origin": "Islamabad",
+      "destination": "Peshawar",
+      "estimatedDelivery": "2023-10-20",
+      "currentLocation": "Delivered",
+      "history": [
+        {
+          "status": "Delivered",
+          "date": "2023-10-20 04:00 PM",
+          "location": "Peshawar"
+        },
+        {
+          "status": "Pending",
+          "location": "Delivered",
+          "date": "05/01/2026, 02:33 pm"
+        }
+      ],
+      "updatedAt": "2026-01-05T09:33:02.054Z"
+    },
+    {
+      "id": "SHP-2293",
+      "origin": "Lahore",
+      "destination": "Karachi",
+      "status": "Delivered",
+      "currentLocation": "Origin Warehouse",
+      "estimatedDelivery": "2026-01-12",
+      "consigneeName": "Zain",
+      "goodsDescription": "50 Cartons",
+      "date": "2026-01-05",
+      "updatedAt": "2026-01-05T09:33:00.247Z",
+      "history": [
+        {
+          "status": "In Transit",
+          "location": "Origin Warehouse",
+          "date": "05/01/2026, 01:00 pm"
+        },
+        {
+          "status": "Delivered",
+          "location": "Origin Warehouse",
+          "date": "05/01/2026, 02:32 pm"
+        }
+      ]
+    },
+    {
+      "id": "BOL-8619",
+      "date": "2026-01-05",
+      "origin": "Lahore",
+      "destination": "Karachi",
+      "status": "Pending",
+      "currentLocation": "Origin Warehouse",
+      "estimatedDelivery": "TBD",
+      "driverId": "2",
+      "consigneeName": "Ali",
+      "goodsDescription": "50 Box",
+      "updatedAt": "2026-01-05T08:17:06.498Z",
+      "history": []
+    }
+  ],
+  "drivers": [
+    {
+      "id": "1",
+      "name": "Ali Khan",
+      "phone": "0300-1234567",
+      "truckNumber": "LEC-1234",
+      "truckType": "Mazda",
+      "city": "Lahore",
+      "status": "Active"
+    },
+    {
+      "id": "2",
+      "name": "Muhammad Rizwan",
+      "phone": "0321-9876543",
+      "truckNumber": "KHI-5678",
+      "truckType": "Container",
+      "city": "Karachi",
+      "status": "On Trip"
+    }
+  ],
+  "pricing": {
+    "mazda": 50,
+    "hyundai": 80,
+    "shehzore": 30,
+    "container": 120,
+    "perKmRate": 1,
+    "weightMultiplier": 0.1
+  },
+  "posts": [
+    {
+      "id": "1",
+      "slug": "top-5-logistics-tips",
+      "title": "Top 5 Logistics Tips for Small Businesses in Pakistan",
+      "excerpt": "Discover how to optimize your supply chain and reduce costs with our expert advice tailored for the local market.",
+      "date": "October 15, 2023",
+      "author": "JFS Team",
+      "category": "Tips & Tricks",
+      "content": "Logistics is the backbone of any product-based business...",
+      "image": "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=2070&auto=format&fit=crop"
+    }
+  ],
+  "reviews": [
+    {
+      "name": "Zain",
+      "comment": "Best Services In Faisalabad",
+      "location": "Faisalabad",
+      "rating": 5,
+      "id": "REV-1767598419063",
+      "createdAt": "2026-01-05T07:33:39.063Z",
+      "status": "approved"
+    },
+    {
+      "name": "Usman",
+      "comment": "Good",
+      "location": "Lahore",
+      "rating": 5,
+      "id": "REV-1767605360406",
+      "createdAt": "2026-01-05T09:29:20.406Z",
+      "status": "approved"
+    }
+  ],
+  "messages": []
+}

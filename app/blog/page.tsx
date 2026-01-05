@@ -1,10 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { mockBlogPosts } from "@/lib/mockData";
+import { useEffect, useState } from "react";
 import BlogCard from "@/components/BlogCard";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 
 const container = {
     hidden: { opacity: 0 },
@@ -22,6 +20,26 @@ const item = {
 };
 
 export default function BlogPage() {
+    const [posts, setPosts] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchPosts = async () => {
+            try {
+                const res = await fetch("/api/blog");
+                if (res.ok) {
+                    const data = await res.json();
+                    setPosts(data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch posts:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchPosts();
+    }, []);
+
     return (
         <div className="bg-transparent">
             {/* Header */}
@@ -49,23 +67,31 @@ export default function BlogPage() {
 
             {/* Blog Grid */}
             <section className="py-12 px-4 md:px-8 max-w-7xl mx-auto">
-                <motion.div
-                    variants={container}
-                    initial="hidden"
-                    animate="show"
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-                >
-                    {mockBlogPosts.map((post) => (
-                        <motion.div key={post.slug} variants={item}>
-                            <BlogCard post={post} />
-                        </motion.div>
-                    ))}
-                </motion.div>
-
-                {mockBlogPosts.length === 0 && (
-                    <div className="text-center py-20 bg-dark-800/50 rounded-2xl border border-gray-700">
-                        <p className="text-gray-400 text-lg">No articles found at the moment. Check back soon!</p>
+                {loading ? (
+                    <div className="flex justify-center py-20">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
                     </div>
+                ) : (
+                    <>
+                        <motion.div
+                            variants={container}
+                            initial="hidden"
+                            animate="show"
+                            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+                        >
+                            {posts.map((post: any) => (
+                                <motion.div key={post.slug} variants={item}>
+                                    <BlogCard post={post} />
+                                </motion.div>
+                            ))}
+                        </motion.div>
+
+                        {posts.length === 0 && (
+                            <div className="text-center py-20 bg-dark-800/50 rounded-2xl border border-gray-700">
+                                <p className="text-gray-400 text-lg">No articles found at the moment. Check back soon!</p>
+                            </div>
+                        )}
+                    </>
                 )}
             </section>
 

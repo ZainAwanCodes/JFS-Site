@@ -89,7 +89,7 @@ export default function Navbar() {
               </motion.div>
             ))}
             <Link
-              href="/contact"
+              href="/booking"
               className="px-6 py-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-lg font-semibold hover:from-primary-600 hover:to-primary-700 transition-all transform hover:scale-105"
             >
               Book Now

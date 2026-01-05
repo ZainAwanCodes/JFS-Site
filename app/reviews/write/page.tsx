@@ -5,24 +5,41 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Star, Send, ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 
 export default function WriteReviewPage() {
     const router = useRouter();
     const [rating, setRating] = useState(0);
     const [hoveredRating, setHoveredRating] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [formData, setFormData] = useState({
+        name: "",
+        comment: "",
+        location: ""
+    });
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (rating === 0) return;
         setIsSubmitting(true);
 
-        // Simulate API call
-        setTimeout(() => {
+        try {
+            const res = await fetch("/api/reviews", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    ...formData,
+                    rating
+                }),
+            });
+
+            if (res.ok) {
+                router.push("/reviews");
+            }
+        } catch (error) {
+            console.error("Failed to submit review:", error);
+        } finally {
             setIsSubmitting(false);
-            router.push("/reviews");
-        }, 1500);
+        }
     };
 
     return (
@@ -73,16 +90,20 @@ export default function WriteReviewPage() {
                                 <input
                                     type="text"
                                     required
+                                    value={formData.name}
+                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                     className="w-full px-4 py-3 bg-dark-900 border border-gray-700 rounded-xl text-white focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                                     placeholder="Your Name"
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-2">Order ID (Optional)</label>
+                                <label className="block text-sm font-medium text-gray-300 mb-2">Location (Optional)</label>
                                 <input
                                     type="text"
+                                    value={formData.location}
+                                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                                     className="w-full px-4 py-3 bg-dark-900 border border-gray-700 rounded-xl text-white focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-                                    placeholder="e.g., JFS-12345"
+                                    placeholder="e.g., Lahore"
                                 />
                             </div>
                         </div>
@@ -92,6 +113,8 @@ export default function WriteReviewPage() {
                             <textarea
                                 required
                                 rows={4}
+                                value={formData.comment}
+                                onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
                                 className="w-full px-4 py-3 bg-dark-900 border border-gray-700 rounded-xl text-white focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                                 placeholder="Tell us about your experience..."
                             ></textarea>
