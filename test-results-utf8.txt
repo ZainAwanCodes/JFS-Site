@@ -1,0 +1,32 @@
+﻿--- ≡ƒº¬ STARTING API INTEGRATION TESTS ---
+
+Γ£à [PASS] GET /api/bookings - Status: 200
+   Returned: Array with 1 records/keys.
+
+Γ£à [PASS] GET /api/shipments - Status: 200
+   Returned: Array with 4 records/keys.
+
+Γ£à [PASS] GET /api/drivers - Status: 200
+   Returned: Array with 2 records/keys.
+
+Γ£à [PASS] GET /api/pricing - Status: 200
+   Returned: Object with 8 records/keys.
+
+Γ£à [PASS] GET /api/blog - Status: 200
+   Returned: Array with 1 records/keys.
+
+Γ£à [PASS] GET /api/reviews - Status: 200
+   Returned: Array with 4 records/keys.
+
+Γ£à [PASS] GET /api/contact - Status: 200
+   Returned: Array with 0 records/keys.
+
+--- TEST SUMMARY ---
+Total Passed : 7
+Total Failed : 0
+
+--- ≡ƒº¬ TESTING SPECIFIC SHIPMENT TRACKING ---
+Γ£à [PASS] GET /api/shipments?id=SHP-1001 - Status: 200
+   Returned: Object with 12 records/keys.
+
+Γ£à [PASS] Shipment Tracking by ID successful!

@@ -7,7 +7,7 @@ export async function GET(request) {
 
     if (slug) {
         try {
-            const post = db.posts.getBySlug(slug);
+            const post = await db.posts.getBySlug(slug);
             if (!post) {
                 return NextResponse.json({ error: "Post not found" }, { status: 404 });
             }
@@ -18,7 +18,7 @@ export async function GET(request) {
     }
 
     try {
-        const posts = db.posts.getAll();
+        const posts = await db.posts.getAll();
         return NextResponse.json(posts);
     } catch (error) {
         return NextResponse.json({ error: "Failed to fetch posts" }, { status: 500 });
@@ -28,7 +28,7 @@ export async function GET(request) {
 export async function POST(request) {
     try {
         const data = await request.json();
-        const post = db.posts.add(data);
+        const post = await db.posts.add(data);
         return NextResponse.json(post);
     } catch (error) {
         return NextResponse.json({ error: "Failed to create post" }, { status: 500 });
@@ -39,7 +39,7 @@ export async function PATCH(request) {
     try {
         const data = await request.json();
         const { id, ...updates } = data;
-        db.posts.update(id, updates);
+        await db.posts.update(id, updates);
         return NextResponse.json({ success: true });
     } catch (error) {
         return NextResponse.json({ error: "Failed to update post" }, { status: 500 });
@@ -50,7 +50,7 @@ export async function DELETE(request) {
     try {
         const { searchParams } = new URL(request.url);
         const id = searchParams.get("id");
-        db.posts.delete(id);
+        await db.posts.delete(id);
         return NextResponse.json({ success: true });
     } catch (error) {
         return NextResponse.json({ error: "Failed to delete post" }, { status: 500 });

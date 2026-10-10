@@ -6,17 +6,18 @@ export async function GET(request) {
     const id = searchParams.get("id");
 
     if (id) {
-        const shipment = db.shipments.getById(id);
+        const shipment = await db.shipments.getById(id);
         if (!shipment) return NextResponse.json({ error: "Not found" }, { status: 404 });
         return NextResponse.json(shipment);
     }
 
-    return NextResponse.json(db.shipments.getAll());
+    const shipments = await db.shipments.getAll();
+    return NextResponse.json(shipments);
 }
 
 export async function POST(request) {
     const data = await request.json();
-    const shipment = db.shipments.add(data);
+    const shipment = await db.shipments.add(data);
     return NextResponse.json(shipment);
 }
 
@@ -26,7 +27,7 @@ export async function PATCH(request) {
         const { id, ...updates } = data;
 
         // Find existing shipment to check for changes
-        const currentShipment = db.shipments.getById(id);
+        const currentShipment = await db.shipments.getById(id);
         if (currentShipment) {
             const history = currentShipment.history || [];
 
@@ -51,7 +52,7 @@ export async function PATCH(request) {
             }
         }
 
-        db.shipments.update(id, updates);
+        await db.shipments.update(id, updates);
         return NextResponse.json({ success: true });
     } catch (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });
